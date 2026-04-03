@@ -1,3 +1,6 @@
+
+
+
 # Seyahat Planlayıcı API 🌍
 
 Seyahat destinasyonlarını yönetmek için geliştirilmiş REST API.
@@ -31,3 +34,6 @@ Seyahat destinasyonlarını yönetmek için geliştirilmiş REST API.
 2. `seyahat_db` veritabanı oluşturulmalı
 3. `application.properties` düzenlenmeli
 4. `mvn spring-boot:run` ile çalıştırılır
+
+## API Dokümantasyonu
+Swagger UI: http://localhost:8080/swagger-ui/index.html
