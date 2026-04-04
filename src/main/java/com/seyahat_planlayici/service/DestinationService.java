@@ -51,4 +51,7 @@ public class DestinationService {
         existing.setCategory(updated.getCategory());
         return repository.save(existing);
     }
+    public List<Destination> search(String keyword) {
+        return repository.search(keyword);
+    }
 }

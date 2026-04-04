@@ -56,4 +56,8 @@ public class DestinationController {
     public ResponseEntity<Destination> update(@PathVariable Long id, @Valid @RequestBody Destination destination) {
         return ResponseEntity.ok(service.update(id, destination));
     }
+    @GetMapping("/search")
+    public List<Destination> search(@RequestParam String keyword) {
+        return service.search(keyword);
+    }
 }
