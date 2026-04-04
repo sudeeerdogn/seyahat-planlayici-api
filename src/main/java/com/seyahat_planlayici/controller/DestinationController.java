@@ -1,5 +1,6 @@
 package com.seyahat_planlayici.controller;
 
+import jakarta.validation.Valid;
 import com.seyahat_planlayici.model.Destination;
 import com.seyahat_planlayici.service.DestinationService;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +27,10 @@ public class DestinationController {
     }
 
     @PostMapping
-    public ResponseEntity<Destination> create(@RequestBody Destination destination) {
+    public ResponseEntity<Destination> create(@Valid @RequestBody Destination destination) {
         return ResponseEntity.ok(service.save(destination));
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
@@ -51,7 +53,7 @@ public class DestinationController {
         return service.getByBudget(budget);
     }
     @PutMapping("/{id}")
-    public ResponseEntity<Destination> update(@PathVariable Long id, @RequestBody Destination destination) {
+    public ResponseEntity<Destination> update(@PathVariable Long id, @Valid @RequestBody Destination destination) {
         return ResponseEntity.ok(service.update(id, destination));
     }
 }

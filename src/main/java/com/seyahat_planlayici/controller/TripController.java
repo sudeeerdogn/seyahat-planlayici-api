@@ -1,5 +1,6 @@
 package com.seyahat_planlayici.controller;
 
+import jakarta.validation.Valid;
 import com.seyahat_planlayici.model.Trip;
 import com.seyahat_planlayici.service.TripService;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class TripController {
     }
 
     @PostMapping
-    public ResponseEntity<Trip> create(@RequestBody Trip trip) {
+    public ResponseEntity<Trip> create(@Valid @RequestBody Trip trip) {
         return ResponseEntity.ok(service.save(trip));
     }
 
