@@ -50,4 +50,8 @@ public class DestinationController {
     public List<Destination> getByBudget(@PathVariable Double budget) {
         return service.getByBudget(budget);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<Destination> update(@PathVariable Long id, @RequestBody Destination destination) {
+        return ResponseEntity.ok(service.update(id, destination));
+    }
 }

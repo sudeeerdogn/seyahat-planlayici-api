@@ -41,4 +41,14 @@ public class DestinationService {
     public List<Destination> getByBudget(Double budget) {
         return repository.findByEstimatedBudgetLessThanEqual(budget);
     }
+    public Destination update(Long id, Destination updated) {
+        Destination existing = getById(id);
+        existing.setName(updated.getName());
+        existing.setCountry(updated.getCountry());
+        existing.setDescription(updated.getDescription());
+        existing.setEstimatedBudget(updated.getEstimatedBudget());
+        existing.setDurationDays(updated.getDurationDays());
+        existing.setCategory(updated.getCategory());
+        return repository.save(existing);
+    }
 }
