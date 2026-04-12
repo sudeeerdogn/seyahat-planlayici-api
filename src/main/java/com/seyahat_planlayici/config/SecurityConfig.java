@@ -47,3 +47,59 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .httpBasic(basic -> basic.disable())
                 .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .anyRequest().authenticated())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        return http.build();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return username -> {
+            throw new RuntimeException("UserDetailsService kullanılmıyor");
+        };
+    }
+
+    @Component
+    @RequiredArgsConstructor
+    public static class JwtAuthFilter extends OncePerRequestFilter {
+
+        private final JwtService jwtService;
+        private final UserRepository userRepository;
+
+        @Override
+        protected void doFilterInternal(HttpServletRequest request,
+                                        HttpServletResponse response,
+                                        FilterChain filterChain)
+                throws ServletException, IOException {
+
+            String authHeader = request.getHeader("Authorization");
+
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            String token = authHeader.substring(7);
+
+            if (jwtService.isTokenValid(token)) {
+                String email = jwtService.extractEmail(token);
+                userRepository.findByEmail(email).ifPresent(user -> {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(user, null, List.of());
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                });
+            }
+
+            filterChain.doFilter(request, response);
+        }
+    }
+}
