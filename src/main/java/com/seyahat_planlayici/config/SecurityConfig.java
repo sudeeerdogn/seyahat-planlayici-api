@@ -66,15 +66,15 @@ public class SecurityConfig {
     public UrlBasedCorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // BURASI ÖNEMLİ: Kendi Vercel linkini buraya ekle
+        // TAM EŞLEŞME: Tarayıcıdaki linkin aynısı burada olmalı
         configuration.setAllowedOrigins(Arrays.asList(
-                "https://seyahat-planlayici-frontend.vercel.app", // Kendi domainini yaz
-                "http://localhost:3000",
-                "http://localhost:5173"
+                "https://seyahat-frontend.vercel.app", // Senin verdiğin link
+                "http://localhost:3000",              // Yerel geliştirme için
+                "http://localhost:5173"               // Vite kullanıyorsan
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "X-Requested-With"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "X-Requested-With", "Origin"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
