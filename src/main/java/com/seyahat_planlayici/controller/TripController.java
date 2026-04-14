@@ -2,7 +2,7 @@ package com.seyahat_planlayici.controller;
 
 import jakarta.validation.Valid;
 import com.seyahat_planlayici.model.Trip;
-import com.seyahat_planlayici.service.TripService;
+import com.seyahat_planlayici.service.TripServiceContract;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TripController {
 
-    private final TripService service;
+    private final TripServiceContract service;
 
     @GetMapping
     public List<Trip> getAll() {

@@ -2,7 +2,7 @@ package com.seyahat_planlayici.controller;
 
 import jakarta.validation.Valid;
 import com.seyahat_planlayici.model.Destination;
-import com.seyahat_planlayici.service.DestinationService;
+import com.seyahat_planlayici.service.DestinationServiceContract;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DestinationController {
 
-    private final DestinationService service;
+    private final DestinationServiceContract service;
 
     @GetMapping
     public List<Destination> getAll() {

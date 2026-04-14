@@ -1,30 +1,28 @@
 package com.seyahat_planlayici.controller;
 
-import com.seyahat_planlayici.model.User;
-import com.seyahat_planlayici.service.AuthService;
+import com.seyahat_planlayici.dto.auth.AuthResponse;
+import com.seyahat_planlayici.dto.auth.LoginRequest;
+import com.seyahat_planlayici.dto.auth.RegisterRequest;
+import com.seyahat_planlayici.service.AuthServiceContract;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthService authService;
+    private final AuthServiceContract authService;
 
     @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register(@RequestBody User user) {
-        return ResponseEntity.ok(authService.register(user));
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+        return ResponseEntity.ok(authService.register(request));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> request) {
-        return ResponseEntity.ok(authService.login(
-                request.get("email"),
-                request.get("password")
-        ));
+    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+        return ResponseEntity.ok(authService.login(request));
     }
 }

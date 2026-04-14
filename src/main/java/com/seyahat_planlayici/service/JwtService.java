@@ -3,26 +3,31 @@ package com.seyahat_planlayici.service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class JwtService {
 
-    private static final String SECRET = "seyahat-planlayici-gizli-anahtar-123456789";
-    private static final long EXPIRATION = 1000 * 60 * 60 * 24; // 24 saat
+    @Value("${app.jwt.secret}")
+    private String secret;
+
+    @Value("${app.jwt.expiration-ms:86400000}")
+    private long expirationMs;
 
     private SecretKey getKey() {
-        return Keys.hmacShaKeyFor(SECRET.getBytes());
+        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
     public String generateToken(String email) {
         return Jwts.builder()
                 .subject(email)
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + EXPIRATION))
+                .expiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(getKey())
                 .compact();
     }

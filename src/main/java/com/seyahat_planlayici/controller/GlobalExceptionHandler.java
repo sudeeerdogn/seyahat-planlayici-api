@@ -1,32 +1,73 @@
 package com.seyahat_planlayici.controller;
 
+import com.seyahat_planlayici.exception.ApiError;
+import com.seyahat_planlayici.exception.ConflictException;
+import com.seyahat_planlayici.exception.ResourceNotFoundException;
+import com.seyahat_planlayici.exception.UnauthorizedException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
-        Map<String, Object> error = new HashMap<>();
-        error.put("status", 404);
-        error.put("message", ex.getMessage());
-        error.put("timestamp", LocalDateTime.now());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiError> handleNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI(), null);
     }
-    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationException(
-            org.springframework.web.bind.MethodArgumentNotValidException ex) {
-        Map<String, Object> errors = new HashMap<>();
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ApiError> handleConflict(ConflictException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI(), null);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<ApiError> handleUnauthorized(UnauthorizedException ex, HttpServletRequest request) {
+        return buildError(HttpStatus.UNAUTHORIZED, ex.getMessage(), request.getRequestURI(), null);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiError> handleValidationException(MethodArgumentNotValidException ex, HttpServletRequest request) {
+        Map<String, String> validationErrors = new LinkedHashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
+                validationErrors.put(error.getField(), resolveValidationMessage(error))
         );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+
+        return buildError(HttpStatus.BAD_REQUEST, "Validation failed", request.getRequestURI(), validationErrors);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleUnexpected(Exception ex, HttpServletRequest request) {
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Beklenmeyen bir hata oluştu.", request.getRequestURI(), null);
+    }
+
+    private ResponseEntity<ApiError> buildError(
+            HttpStatus status,
+            String message,
+            String path,
+            Map<String, String> validationErrors
+    ) {
+        ApiError apiError = new ApiError(
+                LocalDateTime.now(),
+                status.value(),
+                status.getReasonPhrase(),
+                message,
+                path,
+                validationErrors
+        );
+
+        return ResponseEntity.status(status).body(apiError);
+    }
+
+    private String resolveValidationMessage(FieldError error) {
+        return error.getDefaultMessage() != null ? error.getDefaultMessage() : "Geçersiz alan";
     }
 }
